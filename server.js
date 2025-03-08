@@ -26,6 +26,7 @@ const VALID_CATEGORIES = [
 const MESSAGE_PATTERNS = {
   expense: [
     /Gastei (\d+) reais com (.+) em (.+)/i,
+    /Gastei (\d+) com (.+) em (.+)/i,
     /(\d+) com (.+) em (.+)/i,
     /(\d+) em (.+) em (.+)/i,
     /(\d+) (.+) em (.+)/i,
@@ -33,6 +34,8 @@ const MESSAGE_PATTERNS = {
   total: [/Gasto total em (.+)/i, /Gasto total/i],
   greeting: /^(Olá|Oi|ola|oi)/i,
 };
+
+let tipLongMessage = false;
 
 const client = twilio(
   process.env.TWILIO_ACCOUNT_SID,
@@ -57,7 +60,19 @@ function extractExpenseData(message) {
       const category = match[3].trim().toLowerCase();
 
       if (VALID_CATEGORIES.includes(category)) {
-        return { amount, description, category, date: new Date() };
+        if (match[0].includes("Gastei") || match[0].includes("gastei")) {
+           tipLongMessage = true;
+          return {
+            amount,
+            description,
+            category,
+            date: new Date(),
+            tipLongMessage,
+          };
+        } else {
+          tipLongMessage = false;
+          return { amount, description, category, date: new Date() };
+        }
       }
     }
   }
@@ -106,7 +121,7 @@ function sendInvalidFormatMessage(twiml) {
   );
 }
 
-function sendExpenseAddedMessage(twiml, expenseData, total) {
+function sendExpenseAddedMessage(twiml, expenseData, total, tipLongMessage) {
   twiml.message(
     `*Gasto adicionado*\n📌 ${expenseData.description.toUpperCase()} (_${
       expenseData.category.charAt(0).toUpperCase() +
@@ -115,6 +130,13 @@ function sendExpenseAddedMessage(twiml, expenseData, total) {
       2
     )}*\n\n${expenseData.date.toLocaleDateString("pt-BR")}`
   );
+  if (tipLongMessage) {
+    twiml.message(`
+    🔎 _Dica: Você não precisa escrever com detalhes, pode apenas falar exemplo "25 uber em gastos fixos" que já vou entender._
+    `);
+  } else {
+    null;
+  }
 }
 
 function sendTotalExpensesMessage(twiml, total, category) {
@@ -144,7 +166,7 @@ app.post("/webhook", async (req, res) => {
       try {
         await newExpense.save();
         const total = await calculateTotalExpenses(userId);
-        sendExpenseAddedMessage(twiml, expenseData, total);
+        sendExpenseAddedMessage(twiml, expenseData, total,tipLongMessage);
       } catch (err) {
         console.error("Error saving expense:", err);
         twiml.message("Erro ao salvar gasto.");
