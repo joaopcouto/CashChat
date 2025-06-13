@@ -48,7 +48,7 @@ Comigo, você consegue:
 
 1️⃣ Anotar seus gastos e receitas em segundos
 1️⃣ Anotar seus gastos e receitas em segundos
-2️⃣   Anotar seus lembretes e compromissos de forma simples
+2️⃣ Anotar seus lembretes e compromissos de forma simples
 3️⃣ Acompanhar seus gastos por categoria (Lazer, Gastos fixos, etc.)
 4️⃣ Acompanhar seu gasto ou receita total
 5️⃣ Simples de remover um gasto caso anote errado
@@ -108,34 +108,12 @@ export function sendExpenseDeletedMessage(twiml, expenseData) {
   twiml.message(`🗑️ Gasto #_${expenseData.messageId}_ removido.`);
 }
 
-export function sendTotalExpensesMessage(twiml, total, category, type) {
-  const categoryMessage = category
-    ? ` em _*${category.charAt(0).toUpperCase() + category.slice(1)}*_`
-    : "";
-  const typeLabel = type === "income" ? "Receita" : "Gasto";
-  twiml.message(
-    `*${typeLabel} total*${categoryMessage}:\nR$ ${total.toFixed(2)}`
-  );
-}
-
-export function sendTotalIncomeMessage(twiml, total) {
-  twiml.message(`*Receita total*:\nR$ ${total.toFixed(2)}`);
-}
-
-export function sendTotalExpensesAllMessage(twiml, total) {
-  twiml.message(`*Gasto total*:\nR$ ${total.toFixed(2)}`);
-}
-
-export function sendTotalExpensesLastMonthsMessage(
-  twiml,
-  spendingHistoryLastMonths,
-  monthName
-) {
-  twiml.message(
-    `*Gasto total em ${monthName}*:\nR$ ${spendingHistoryLastMonths[0].total.toFixed(
-      2
-    )}`
-  );
+export function sendTotalIncomeMessage(twiml, total, monthName) {
+  let message = `*Receita total*: R$ ${total.toFixed(2)}`;
+  if (monthName) {
+    message = `*Receita total* em _*${monthName}*_: \nR$ ${total.toFixed(2)}`;
+  }
+  twiml.message(message);
 }
 
 export function sendTotalRemindersMessage(twiml, allFutureReminders) {
