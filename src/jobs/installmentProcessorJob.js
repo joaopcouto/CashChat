@@ -1,4 +1,3 @@
-
 import cron from "node-cron";
 import InstallmentPurchase from "../models/InstallmentPurchase.js";
 import Expense from "../models/Expense.js";
@@ -10,7 +9,7 @@ import { sendProactiveMessage } from '../services/twilioService.js';
 
 const generateId = customAlphabet("1234567890abcdef", 5);
 
-const processInstallments = async () => {
+export const processInstallments = async () => {
   const today = new Date();
   const currentDay = today.getDate(); 
   
@@ -84,7 +83,7 @@ const processInstallments = async () => {
 };
 
 export const startInstallmentJob = () => {
-  cron.schedule("15 0 * * *", processInstallments, {
+  cron.schedule("1 0 * * *", processInstallments, {
     scheduled: true,
     timezone: "America/Sao_Paulo",
   });

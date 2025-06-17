@@ -137,7 +137,7 @@ router.post("/", async (req, res) => {
             `*Categoria:* ${finalCategory}\n` +
             `*Parcelas:* ${installments}x de R$ ${installmentAmount.toFixed(
               2
-            )} (Total: R$ ${totalAmount.toFixed(2)})\n` + 
+            )} (Total: R$ ${totalAmount.toFixed(2)})\n` +
             `*Vencimento:* Todo dia ${dueDay}\n\n` +
             `Como sua fatura deste mês já fechou, a 1ª parcela será lançada como despesa apenas no próximo vencimento. 😉\n\n` +
             `_Para cancelar, use o ID: *#${purchaseId}*_`;
@@ -510,9 +510,12 @@ router.post("/", async (req, res) => {
 
             activePurchases.forEach((purchase) => {
               responseMessage +=
-                `*Produto:* _${purchase.description}_\n` +
-                `*Progresso:* _${purchase.currentInstallment} de ${purchase.numberOfInstallments}_\n` +
-                `*Valor:* _R$ ${purchase.installmentAmount.toFixed(2)} / mês_\n` +
+                `*Item:* _${purchase.description}_\n` +
+                `*Categoria:* _${purchase.category}_\n` +
+                `*Parcelas:* _${purchase.currentInstallment} de ${purchase.numberOfInstallments}_\n` +
+                `*Valor:* _R$ ${purchase.installmentAmount.toFixed(
+                  2
+                )} / mês_\n` +
                 `*Vencimento:* _todo dia ${purchase.dueDay}_\n` +
                 `*ID:* _#${purchase.originalMessageId}_\n\n`;
             });
@@ -803,7 +806,6 @@ router.post("/", async (req, res) => {
   } catch (err) {
     devLog("Erro principal no webhook:", err);
     sendHelpMessage(twiml);
-    // Garante que o estado seja limpo em caso de erro para não travar o usuário
     if (conversationState[userId]) {
       delete conversationState[userId];
     }

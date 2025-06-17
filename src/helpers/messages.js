@@ -112,7 +112,8 @@ export function formatInstallmentNotificationMessage(expense) {
   const message = `📝 *Parcela Registrada*\n\n` +
                   `📌 ${description} (${category})\n` +
                   `💰 R$ ${amount}\n\n` +
-                  `🗓️ ${formattedDate} - Lançamento automático`;
+                  `🗓️ ${formattedDate} - #${expense.messageId}\n` +
+                  `_Lançamento automático_`;
                   
   return message;
 }
